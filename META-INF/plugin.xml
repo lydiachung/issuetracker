@@ -1,0 +1,60 @@
+<idea-plugin version="2">
+  <name>Issue Tracker</name>
+  <description>Issue Tracker</description>
+  <version>1.0</version>
+  <vendor>Arete Inc</vendor>
+
+  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
+  <idea-version since-build="107.105"/>
+
+  <depends>com.intellij.tasks</depends>
+  <depends>Git4Idea</depends>
+
+  <application-components>
+    <!-- Add your application components here -->
+  </application-components>
+
+  <project-components>
+    <!-- Add your project components here -->
+  </project-components>
+
+
+    <actions>
+        <!--<group id="IssueTracker.IssueTrackerMenu" text="_Issue Tracker Menu" description="Issue tracker menu">-->
+            <!--<add-to-group group-id="MainMenu" anchor="last"  />-->
+            <!--<action id="IssueTracker.com.areteinc.plugin.issueTracker.TaskOpen" class="com.areteinc.plugin.issueTracker.com.areteinc.plugin.issueTracker.TaskOpen" text="Task _Open" description="Open Task" />-->
+            <!--&lt;!&ndash;<action id="IssueTracker.Textboxes" class="com.areteinc.plugin.issueTracker.TextBox" text="Text _Boxes" description="A test menu item" />&ndash;&gt;-->
+            <!--&lt;!&ndash; action id="Myplugin.Dialogs" class="Mypackage.MyShowDialog" text="Show _Dialog" description="A test menu item" /&ndash;&gt;-->
+        <!--</group>-->
+        <!--<group id="IssueTracker.IssueTrackerMenu" text="_Issue Tracker Menu" description="Issue tracker menu">&ndash;&gt;-->
+            <!--<add-to-group group-id="MainMenu" anchor="last"/>-->
+            <!--<action id="IssueTracker.ActionNew" class="com.areteinc.plugin.issueTracker.ActionNew" text="ActionNew" description="ActionNew">-->
+            <!--<action id="IssueTracker.TaskOpen" class="com.areteinc.plugin.issueTracker.TaskOpen" text="Task _Open" description="Open task" />-->
+            <!--<action id="IssueTracker.Textboxes" class="com.areteinc.plugin.issueTracker.TextBox" text="Text _Boxes" description="A test menu item" />-->
+            <!--<action id="IssueTracker.BranchAdd" class="com.areteinc.plugin.issueTracker.BranchAdd" text="Branch _Add" description="Add Branch">-->
+            <!--<action id="IssueTracker.BranchNew" class="com.areteinc.plugin.issueTracker.BranchNew" text="Branch _New" description="New Branch">-->
+                <!--<keyboard-shortcut keymap="$default" first-keystroke="O"/>-->
+            <!--</action>-->
+        <!--</group>-->
+
+            <!--<add-to-group group-id="MainMenu" anchor="first"/>-->
+        <!--</action>-->
+
+        <!--<action id="IssueTracker.ActionNew" class="com.areteinc.plugin.issueTracker.ActionNew" text="ActionNew" description="ActionNew">-->
+            <!--<add-to-group group-id="ToolsMenu" anchor="last"/>-->
+        <!--</action>-->
+
+        <!--<action id="ActionNew" class="com.areteinc.plugin.issueTracker.ActionNew" text="ActionNew" description="ActionNew">-->
+        <action id="IssueTracker.BranchNew" class="com.areteinc.plugin.issueTracker.BranchNew" text="Branch _New" description="New Branch">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+
+
+
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+    </extensions>
+
+</idea-plugin>
