@@ -53,6 +53,9 @@
         <action id="BranchMerge" class="com.areteinc.plugin.issueTracker.BranchMerge" text="BranchMerge" description="BranchMerge">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
+        <action id="ConflictResolve" class="com.areteinc.plugin.issueTracker.ConflictResolve" text="ConflictResolve" description="ConflictResolve">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">

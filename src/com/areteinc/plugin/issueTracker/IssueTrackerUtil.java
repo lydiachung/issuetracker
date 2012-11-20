@@ -8,6 +8,8 @@ import git4idea.repo.GitRepository;
 import git4idea.repo.GitRepositoryManager;
 import git4idea.branch.GitBranchOperationsProcessor;
 import git4idea.ui.branch.GitMultiRootBranchConfig;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,9 +23,14 @@ public class IssueTrackerUtil {
 
     public static List<GitRepository> getGitRepositories(AnActionEvent event){
         Project project = event.getData(PlatformDataKeys.PROJECT);
-        GitRepositoryManager gitRepositoryManager = GitUtil.getRepositoryManager(project);
-        List<GitRepository> gitRepositories = gitRepositoryManager.getRepositories();
-        return gitRepositories;
+        if(project != null) {
+            GitRepositoryManager gitRepositoryManager = GitUtil.getRepositoryManager(project);
+            List<GitRepository> gitRepositories = gitRepositoryManager.getRepositories();
+            return gitRepositories;
+        }else{
+            return new ArrayList<GitRepository>(); // return empty list to prevent blow up
+        }
+
     }
 
     public static String getCurrentBranch(AnActionEvent event){
