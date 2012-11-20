@@ -48,12 +48,7 @@ public class BranchMerge extends GitPull {
         String taskSummary = task.getSummary();
         String commitComment = "#"+taskNumber+" "+taskSummary+": ";
 
-//        ChangeListManager changeListManager = ChangeListManager.getInstance(project);
-//        LocalChangeList changeList = changeListManager.getDefaultChangeList();
-//        changeList.setComment(commitComment); // => #9 ninth issue:
-//        changeListManager.addChangeListListener(new LocalChangeListListener(changeListManager));
-//        System.out.println("changeListManager.getChangeLists: " + changeListManager.getChangeLists());
-
+        // TODO: might not need to add changelistlistener every time
         ChangeListManager changeListManager = ChangeListManager.getInstance(project);
         changeListManager.addChangeListListener(new LocalChangeListListener(changeListManager));
         LocalChangeList changeList = changeListManager.addChangeList(localBranchName, commitComment);
@@ -63,17 +58,6 @@ public class BranchMerge extends GitPull {
         // merge
         IssueTrackerUtil.getGitBranchOperationsProcessor(event).merge(localBranchName, true); // localBranch => true
 
-
-
-        //        LocalChangeList changeList = changeListManager.getDefaultChangeList();
-//        changeList.
-//        System.out.println("changeList.getId: "+ changeList.getId());
-//        System.out.println("changeList.getName: "+ changeList.getName());
-//        System.out.println("changeList.getComment: "+ changeList.getComment());
-////        changeList.setComment("#"+taskNumber+" "+taskSummary+": "); // => #9 ninth issue:
-//        System.out.println("changeList.getId: "+ changeList.getId());
-//        System.out.println("changeList.getName: "+ changeList.getName());
-//        System.out.println("changeList.getComment: "+ changeList.getComment());
     }
 }
 
