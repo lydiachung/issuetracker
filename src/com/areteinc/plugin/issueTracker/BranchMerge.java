@@ -1,14 +1,12 @@
 package com.areteinc.plugin.issueTracker;
 
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.changes.ChangeList;
 import com.intellij.tasks.Task;
 import com.intellij.tasks.TaskManager;
-import git4idea.GitUtil;
 import git4idea.actions.GitPull;
-import git4idea.repo.GitRepositoryManager;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.LocalChangeList;
 
@@ -24,10 +22,11 @@ public class BranchMerge extends GitPull {
         Project project = event.getData(PlatformDataKeys.PROJECT);
 
         String masterBranchName = "master";
-        String currentBranchName = IssueTrackerUtil.getCurrentBranch(event); // => 9-ninth_issue
-        String taskNumber = currentBranchName.split("-")[0];
+        String localBranchName = IssueTrackerUtil.getCurrentBranch(event); // => 9-ninth_issue
+        String taskNumber = localBranchName.split("-")[0];
         String taskId = project.getName()+"-"+taskNumber; // myissue-9 (myissues-9), project.getName => myissues
 
+        // ------------------------------------------------------------------------------------------------
         // activate task
         boolean clearContext = true;
         boolean createChangelist = false;
@@ -36,20 +35,37 @@ public class BranchMerge extends GitPull {
         Task task = taskManager.findTask(taskId);
         taskManager.activateTask(task, clearContext, createChangelist); // void activateTask(@NotNull Task task, boolean clearContext, boolean createChangelist);
 
+        // ------------------------------------------------------------------------------------------------
         // check out master
         IssueTrackerUtil.getGitBranchOperationsProcessor(event).checkout(masterBranchName);
 
+        // ------------------------------------------------------------------------------------------------
         // git pull
         super.actionPerformed(event);
 
-        // merge
-        IssueTrackerUtil.getGitBranchOperationsProcessor(event).merge(currentBranchName, true); // localBranch => true
-
-        // update changelist comment
+        // ------------------------------------------------------------------------------------------------
+        // create changelist (update changelist comment)
         String taskSummary = task.getSummary();
+        String commitComment = "#"+taskNumber+" "+taskSummary+": ";
 
         ChangeListManager changeListManager = ChangeListManager.getInstance(project);
-        LocalChangeList changeList = changeListManager.getDefaultChangeList();
-        changeList.setComment("#"+taskNumber+" "+taskSummary+": "); // => #9 ninth issue:
+        LocalChangeList changeList = changeListManager.addChangeList(localBranchName, commitComment);
+        changeListManager.setDefaultChangeList(changeList);
+
+        // ------------------------------------------------------------------------------------------------
+        // merge
+        IssueTrackerUtil.getGitBranchOperationsProcessor(event).merge(localBranchName, true); // localBranch => true
+
+
+
+        //        LocalChangeList changeList = changeListManager.getDefaultChangeList();
+//        changeList.
+//        System.out.println("changeList.getId: "+ changeList.getId());
+//        System.out.println("changeList.getName: "+ changeList.getName());
+//        System.out.println("changeList.getComment: "+ changeList.getComment());
+////        changeList.setComment("#"+taskNumber+" "+taskSummary+": "); // => #9 ninth issue:
+//        System.out.println("changeList.getId: "+ changeList.getId());
+//        System.out.println("changeList.getName: "+ changeList.getName());
+//        System.out.println("changeList.getComment: "+ changeList.getComment());
     }
 }
