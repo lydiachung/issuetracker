@@ -1,12 +1,15 @@
 <idea-plugin version="2">
+  <id>IssueTracker</id>
   <name>Issue Tracker</name>
   <description>Issue Tracker</description>
   <version>1.0</version>
   <vendor>Arete Inc</vendor>
-
+  <category>VCS Integration</category>
+	
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="107.105"/>
-
+  <!-- idea-version since-build="107.105"/ -->
+  
+  <depends>com.intellij.modules.vcs</depends>
   <depends>com.intellij.tasks</depends>
   <depends>Git4Idea</depends>
 
@@ -20,42 +23,15 @@
 
 
     <actions>
-        <!--<group id="IssueTracker.IssueTrackerMenu" text="_Issue Tracker Menu" description="Issue tracker menu">-->
-            <!--<add-to-group group-id="MainMenu" anchor="last"  />-->
-            <!--<action id="IssueTracker.com.areteinc.plugin.issueTracker.archive.TaskOpen" class="com.areteinc.plugin.issueTracker.com.areteinc.plugin.issueTracker.archive.TaskOpen" text="Task _Open" description="Open Task" />-->
-            <!--&lt;!&ndash;<action id="IssueTracker.Textboxes" class="com.areteinc.plugin.issueTracker.archive.TextBox" text="Text _Boxes" description="A test menu item" />&ndash;&gt;-->
-            <!--&lt;!&ndash; action id="Myplugin.Dialogs" class="Mypackage.MyShowDialog" text="Show _Dialog" description="A test menu item" /&ndash;&gt;-->
-        <!--</group>-->
-        <!--<group id="IssueTracker.IssueTrackerMenu" text="_Issue Tracker Menu" description="Issue tracker menu">&ndash;&gt;-->
-            <!--<add-to-group group-id="MainMenu" anchor="last"/>-->
-            <!--<action id="IssueTracker.ActionNew" class="com.areteinc.plugin.issueTracker.archive.ActionNew" text="ActionNew" description="ActionNew">-->
-            <!--<action id="IssueTracker.TaskOpen" class="com.areteinc.plugin.issueTracker.archive.TaskOpen" text="Task _Open" description="Open task" />-->
-            <!--<action id="IssueTracker.Textboxes" class="com.areteinc.plugin.issueTracker.archive.TextBox" text="Text _Boxes" description="A test menu item" />-->
-            <!--<action id="IssueTracker.BranchAdd" class="com.areteinc.plugin.issueTracker.archive.BranchAdd" text="Branch _Add" description="Add Branch">-->
-            <!--<action id="IssueTracker.BranchNew" class="com.areteinc.plugin.issueTracker.BranchNew" text="Branch _New" description="New Branch">-->
-                <!--<keyboard-shortcut keymap="$default" first-keystroke="O"/>-->
-            <!--</action>-->
-        <!--</group>-->
 
-            <!--<add-to-group group-id="MainMenu" anchor="first"/>-->
-        <!--</action>-->
-
-        <!--<action id="IssueTracker.ActionNew" class="com.areteinc.plugin.issueTracker.archive.ActionNew" text="ActionNew" description="ActionNew">-->
-            <!--<add-to-group group-id="ToolsMenu" anchor="last"/>-->
-        <!--</action>-->
-
-        <!--<action id="ActionNew" class="com.areteinc.plugin.issueTracker.archive.ActionNew" text="ActionNew" description="ActionNew">-->
-        <action id="IssueTracker.BranchNew" class="com.areteinc.plugin.issueTracker.BranchNew" text="Branch _New" description="New Branch">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        
+        <action id="IssueTracker.BranchNew" class="com.areteinc.plugin.issueTracker.BranchNew" text="Branch New">
+			<add-to-group group-id="VcsGlobalGroup" anchor="last"/>
+		</action>
+        <action id="BranchMerge" class="com.areteinc.plugin.issueTracker.BranchMerge" text="Branch Merge">
+            <add-to-group group-id="VcsGroup" anchor="last"/>
         </action>
 
-
-        <action id="BranchMerge" class="com.areteinc.plugin.issueTracker.BranchMerge" text="BranchMerge" description="BranchMerge">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-        </action>
-        <action id="ConflictResolve" class="com.areteinc.plugin.issueTracker.archive.ConflictResolve" text="ConflictResolve" description="ConflictResolve">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-        </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">

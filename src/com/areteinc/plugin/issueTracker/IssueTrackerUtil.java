@@ -39,10 +39,6 @@ public class IssueTrackerUtil {
         return currentBranch;
     }
 
-//    public static GitRepository getSelectedGitRepository(List<GitRepository> gitRepositories){
-//        return gitRepositories[0];
-//    }
-
     public static GitBranchOperationsProcessor getGitBranchOperationsProcessor(AnActionEvent event){
         Project project = event.getData(PlatformDataKeys.PROJECT);
         GitRepositoryManager gitRepositoryManager = GitUtil.getRepositoryManager(project);

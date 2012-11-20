@@ -31,6 +31,12 @@ import git4idea.branch.GitBranchOperationsProcessor;
 
 public class BranchNew extends OpenTaskAction {
 
+
+//    5:03:15 PM IncompatibleClassChangeError: update failed for AnAction with ID=IssueTracker.BranchNew: Found interface git4idea.repo.GitRepository, but class was expected
+//    5:03:29 PM IncompatibleClassChangeError: update failed for AnAction with ID=IssueTracker.BranchNew: Found interface git4idea.repo.GitRepository, but class was expected
+//    5:03:31 PM IncompatibleClassChangeError: update failed for AnAction with ID=IssueTracker.BranchNew: Found interface git4idea.repo.GitRepository, but class was expected
+
+
     public BranchNew(){
         super();
     }
@@ -48,14 +54,9 @@ public class BranchNew extends OpenTaskAction {
         TaskManager taskManager = TaskManager.getManager(project);
         Task task = taskManager.getActiveTask();
 
-//        List<GitRepository> gitRepositories = IssueTrackerUtil.getGitRepositories(event);
-//        GitRepository selectedGitRepository = IssueTrackerUtil.getSelectedGitRepository();
         String branchName = task.getNumber()+"-"+task.getSummary().replace(' ', '_');
 
         IssueTrackerUtil.getGitBranchOperationsProcessor(event).checkoutNewBranch(branchName);
-//        new GitBranchOperationsProcessor(project, gitRepositories, selectedGitRepository).checkoutNewBranch(branchName); // makes new branch active
-//        new GitBranchOperationsProcessor(myProject, myRepositories, mySelectedRepository).checkoutNewBranchStartingFrom(name, myBranchName);
-//        new GitBranchOperationsProcessor(myProject, myRepositories, mySelectedRepository).deleteBranch(myBranchName);
     }
 
     public void update(AnActionEvent event) {
