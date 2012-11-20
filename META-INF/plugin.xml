@@ -50,7 +50,9 @@
         </action>
 
 
-
+        <action id="BranchMerge" class="com.areteinc.plugin.issueTracker.BranchMerge" text="BranchMerge" description="BranchMerge">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
