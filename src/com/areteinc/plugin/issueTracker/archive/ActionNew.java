@@ -1,4 +1,4 @@
-package com.areteinc.plugin.issueTracker;
+package com.areteinc.plugin.issueTracker.archive;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
