@@ -1,9 +1,12 @@
 package com.areteinc.plugin.issueTracker;
 
+import com.intellij.notification.NotificationGroup;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.vcs.changes.*;
+import com.intellij.openapi.vcs.changes.ui.ChangesViewContentManager;
 import com.intellij.tasks.Task;
 import com.intellij.tasks.TaskManager;
 import git4idea.actions.GitPull;
@@ -19,45 +22,73 @@ import java.util.Collection;
  */
 public class BranchMerge extends GitPull {
     public void actionPerformed(AnActionEvent event) {
+
+        // ------------------------------------------------------------------------------------------------
+        NotificationGroup notificationGroup = NotificationGroup.toolWindowGroup("Issue Tracker Messages", ChangesViewContentManager.TOOLWINDOW_ID, true);
         Project project = event.getData(PlatformDataKeys.PROJECT);
 
-        String masterBranchName = "master";
-        String localBranchName = IssueTrackerUtil.getCurrentBranch(event); // => 9-ninth_issue
-        String taskNumber = localBranchName.split("-")[0];
-        String taskId = project.getName()+"-"+taskNumber; // myissue-9 (myissues-9), project.getName => myissues
+        try{
 
-        // ------------------------------------------------------------------------------------------------
-        // activate task
-        boolean clearContext = true;
-        boolean createChangelist = false;
+            // ------------------------------------------------------------------------------------------------
+            String masterBranchName = "master";
+            String localBranchName = IssueTrackerUtil.getCurrentBranch(event); // => 9-ninth_issue
+            String taskNumber = localBranchName.split("-")[0]; // => 9
 
-        TaskManager taskManager = TaskManager.getManager(project);
-        Task task = taskManager.findTask(taskId);
-        taskManager.activateTask(task, clearContext, createChangelist); // void activateTask(@NotNull Task task, boolean clearContext, boolean createChangelist);
+            // ------------------------------------------------------------------------------------------------
+            // activate task
+            boolean clearContext = true;
+            boolean createChangelist = false;
 
-        // ------------------------------------------------------------------------------------------------
-        // check out master
-        IssueTrackerUtil.getGitBranchOperationsProcessor(event).checkout(masterBranchName);
+            TaskManager taskManager = TaskManager.getManager(project);
+            Task task = IssueTrackerUtil.getTaskByNumber(taskManager, taskNumber);
 
-        // ------------------------------------------------------------------------------------------------
-        // git pull
-        super.actionPerformed(event);
+            if(task == null){
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("Task ").append(taskNumber).append(" not found. ");
+                stringBuilder.append("Available tasks are: [");
+                for(Task localTask : taskManager.getLocalTasks()){
+                    stringBuilder.append(localTask.getNumber()).append(",");
+                }
+                stringBuilder.append("]");
+                throw new Exception(stringBuilder.toString());
+            }
 
-        // ------------------------------------------------------------------------------------------------
-        // create changelist (update changelist comment)
-        String taskSummary = task.getSummary();
-        String commitComment = "#"+taskNumber+" "+taskSummary+": ";
+            taskManager.activateTask(task, clearContext, createChangelist); // void activateTask(@NotNull Task task, boolean clearContext, boolean createChangelist);
 
-        // TODO: might not need to add changelistlistener every time
-        ChangeListManager changeListManager = ChangeListManager.getInstance(project);
-        changeListManager.addChangeListListener(new LocalChangeListListener(changeListManager));
-        LocalChangeList changeList = changeListManager.addChangeList(localBranchName, commitComment);
-        changeListManager.setDefaultChangeList(changeList);
+            notificationGroup.createNotification("Task " + task.getPresentableName() + " activated", MessageType.INFO).notify(project);
 
-        // ------------------------------------------------------------------------------------------------
-        // merge
-        IssueTrackerUtil.getGitBranchOperationsProcessor(event).merge(localBranchName, true); // localBranch => true
+            // ------------------------------------------------------------------------------------------------
+            // check out master
+            IssueTrackerUtil.getGitBranchOperationsProcessor(event).checkout(masterBranchName);
 
+            // ------------------------------------------------------------------------------------------------
+            // git pull
+            super.actionPerformed(event);
+
+            notificationGroup.createNotification("Master branch pulled", MessageType.INFO).notify(project);
+
+            // ------------------------------------------------------------------------------------------------
+            // create changelist (update changelist comment)
+            String taskSummary = task.getSummary();
+            String commitComment = "#"+taskNumber+" "+taskSummary+": ";
+
+            // TODO: might not need to add changelistlistener every time
+            ChangeListManager changeListManager = ChangeListManager.getInstance(project);
+            changeListManager.addChangeListListener(new LocalChangeListListener(changeListManager));
+            LocalChangeList changeList = changeListManager.addChangeList(localBranchName, commitComment);
+            changeListManager.setDefaultChangeList(changeList);
+
+            notificationGroup.createNotification("Change list " + localBranchName + " created", MessageType.INFO).notify(project);
+
+            // ------------------------------------------------------------------------------------------------
+            // merge
+            IssueTrackerUtil.getGitBranchOperationsProcessor(event).merge(localBranchName, true); // localBranch => true
+
+        }catch(Exception e){
+            notificationGroup.createNotification("Error occurred: " + e.getMessage(), MessageType.ERROR).notify(project);
+        }finally {
+            notificationGroup.createNotification("Merge branch ended", MessageType.INFO).notify(project);
+        }
     }
 }
 

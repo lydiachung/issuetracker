@@ -3,6 +3,8 @@ package com.areteinc.plugin.issueTracker;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.Project;
+import com.intellij.tasks.Task;
+import com.intellij.tasks.TaskManager;
 import git4idea.GitUtil;
 import git4idea.repo.GitRepository;
 import git4idea.repo.GitRepositoryManager;
@@ -45,6 +47,15 @@ public class IssueTrackerUtil {
         List<GitRepository> gitRepositories = gitRepositoryManager.getRepositories();
         GitRepository selectedGitRepository = gitRepositories.get(0);
         return new GitBranchOperationsProcessor(project, gitRepositories, selectedGitRepository);
+    }
+
+    public static Task getTaskByNumber(TaskManager taskManager, String taskNumber){
+        for(Task task : taskManager.getLocalTasks()){
+            if(taskNumber.equals(task.getNumber())){
+                return task;
+            }
+        }
+        return null;
     }
 
 }

@@ -28,8 +28,8 @@
         <action id="IssueTracker.BranchNew" class="com.areteinc.plugin.issueTracker.BranchNew" text="Branch New">
 			<add-to-group group-id="VcsGlobalGroup" anchor="last"/>
 		</action>
-        <action id="BranchMerge" class="com.areteinc.plugin.issueTracker.BranchMerge" text="Branch Merge">
-            <add-to-group group-id="VcsGroup" anchor="last"/>
+        <action id="IssueTracker.BranchMerge" class="com.areteinc.plugin.issueTracker.BranchMerge" text="Branch Merge">
+            <add-to-group group-id="VcsGlobalGroup" anchor="last"/>
         </action>
 
     </actions>

@@ -57,6 +57,7 @@ public class BranchNew extends OpenTaskAction {
         String branchName = task.getNumber()+"-"+task.getSummary().replace(' ', '_');
 
         IssueTrackerUtil.getGitBranchOperationsProcessor(event).checkoutNewBranch(branchName);
+
     }
 
     public void update(AnActionEvent event) {
