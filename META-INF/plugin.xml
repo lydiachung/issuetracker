@@ -23,15 +23,15 @@
 
 
     <actions>
-
-        
         <action id="IssueTracker.BranchNew" class="com.areteinc.plugin.issueTracker.BranchNew" text="Branch New">
 			<add-to-group group-id="VcsGlobalGroup" anchor="last"/>
 		</action>
         <action id="IssueTracker.BranchMerge" class="com.areteinc.plugin.issueTracker.BranchMerge" text="Branch Merge">
             <add-to-group group-id="VcsGlobalGroup" anchor="last"/>
         </action>
-
+        <action id="IssueTracker.BranchDebug" class="com.areteinc.plugin.issueTracker.BranchDebug" text="Branch Debug">
+            <add-to-group group-id="VcsGlobalGroup" anchor="last"/>
+        </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">

@@ -1,8 +1,11 @@
 package com.areteinc.plugin.issueTracker;
 
+import com.intellij.notification.NotificationGroup;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.MessageType;
+import com.intellij.openapi.vcs.changes.ui.ChangesViewContentManager;
 import com.intellij.tasks.Task;
 import com.intellij.tasks.TaskManager;
 import git4idea.GitUtil;
@@ -23,6 +26,19 @@ import java.util.List;
  */
 public class IssueTrackerUtil {
 
+    static NotificationGroup notificationGroup;
+
+    public static void notify(String messageContent, MessageType messageType, Project project){
+        if(notificationGroup == null){
+            notificationGroup = NotificationGroup.toolWindowGroup("Issue Tracker Messages", ChangesViewContentManager.TOOLWINDOW_ID, true);
+        }
+        notificationGroup.createNotification(messageContent, messageType).notify(project);
+    }
+
+    public static Project getProject(AnActionEvent event){
+        return event.getData(PlatformDataKeys.PROJECT);
+    }
+
     public static List<GitRepository> getGitRepositories(AnActionEvent event){
         Project project = event.getData(PlatformDataKeys.PROJECT);
         if(project != null) {
@@ -41,10 +57,15 @@ public class IssueTrackerUtil {
         return currentBranch;
     }
 
-    public static GitBranchOperationsProcessor getGitBranchOperationsProcessor(AnActionEvent event){
+    public static GitBranchOperationsProcessor getGitBranchOperationsProcessor(AnActionEvent event) throws Exception {
         Project project = event.getData(PlatformDataKeys.PROJECT);
         GitRepositoryManager gitRepositoryManager = GitUtil.getRepositoryManager(project);
         List<GitRepository> gitRepositories = gitRepositoryManager.getRepositories();
+
+        if(gitRepositories.size() != 1){
+            throw new Exception("More than one git repository detected [" + gitRepositories + "].");
+        }
+
         GitRepository selectedGitRepository = gitRepositories.get(0);
         return new GitBranchOperationsProcessor(project, gitRepositories, selectedGitRepository);
     }

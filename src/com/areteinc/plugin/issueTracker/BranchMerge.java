@@ -21,11 +21,11 @@ import java.util.Collection;
  * To change this template use File | Settings | File Templates.
  */
 public class BranchMerge extends GitPull {
+
     public void actionPerformed(AnActionEvent event) {
 
         // ------------------------------------------------------------------------------------------------
-        NotificationGroup notificationGroup = NotificationGroup.toolWindowGroup("Issue Tracker Messages", ChangesViewContentManager.TOOLWINDOW_ID, true);
-        Project project = event.getData(PlatformDataKeys.PROJECT);
+        Project project = IssueTrackerUtil.getProject(event);
 
         try{
 
@@ -33,6 +33,10 @@ public class BranchMerge extends GitPull {
             String masterBranchName = "master";
             String localBranchName = IssueTrackerUtil.getCurrentBranch(event); // => 9-ninth_issue
             String taskNumber = localBranchName.split("-")[0]; // => 9
+
+            if(localBranchName.equals(masterBranchName)){
+                throw new Exception("Please checkout local branch for branch merge operation.");
+            }
 
             // ------------------------------------------------------------------------------------------------
             // activate task
@@ -55,7 +59,7 @@ public class BranchMerge extends GitPull {
 
             taskManager.activateTask(task, clearContext, createChangelist); // void activateTask(@NotNull Task task, boolean clearContext, boolean createChangelist);
 
-            notificationGroup.createNotification("Task " + task.getPresentableName() + " activated", MessageType.INFO).notify(project);
+            IssueTrackerUtil.notify("Activated task " + task.getPresentableName() + ".", MessageType.INFO, project);
 
             // ------------------------------------------------------------------------------------------------
             // check out master
@@ -65,7 +69,7 @@ public class BranchMerge extends GitPull {
             // git pull
             super.actionPerformed(event);
 
-            notificationGroup.createNotification("Master branch pulled", MessageType.INFO).notify(project);
+            IssueTrackerUtil.notify("Pulled master branch", MessageType.INFO, project);
 
             // ------------------------------------------------------------------------------------------------
             // create changelist (update changelist comment)
@@ -78,16 +82,14 @@ public class BranchMerge extends GitPull {
             LocalChangeList changeList = changeListManager.addChangeList(localBranchName, commitComment);
             changeListManager.setDefaultChangeList(changeList);
 
-            notificationGroup.createNotification("Change list " + localBranchName + " created", MessageType.INFO).notify(project);
+            IssueTrackerUtil.notify("Created change list " + localBranchName + ".", MessageType.INFO, project);
 
             // ------------------------------------------------------------------------------------------------
             // merge
             IssueTrackerUtil.getGitBranchOperationsProcessor(event).merge(localBranchName, true); // localBranch => true
 
         }catch(Exception e){
-            notificationGroup.createNotification("Error occurred: " + e.getMessage(), MessageType.ERROR).notify(project);
-        }finally {
-            notificationGroup.createNotification("Merge branch ended", MessageType.INFO).notify(project);
+            IssueTrackerUtil.notify("Failed to merge branch - error occurred: '" + e.getMessage() + "'", MessageType.ERROR, project);
         }
     }
 }
