@@ -87,8 +87,15 @@ public class IssueTrackerUtil {
     }
 
     public static Task getTaskByNumber(TaskManager taskManager, String taskNumber){
+        // check local task
         for(Task task : taskManager.getLocalTasks()){
-            if(taskNumber.equals(task.getNumber())){
+            if(taskNumber.equals(task.getNumber()) && task.getIssueUrl() != null){
+                return task;
+            }
+        }
+        // check remote task
+        for(Task task: taskManager.getIssues("")){
+            if(taskNumber.equals(task.getNumber()) && task.getIssueUrl() != null){
                 return task;
             }
         }

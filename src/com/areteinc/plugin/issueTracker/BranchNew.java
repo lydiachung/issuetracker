@@ -69,7 +69,6 @@ public class BranchNew extends OpenTaskAction {
 
             Task task = taskManager.getActiveTask();
 
-
             // ------------------------------------------------------------------------------------------------
             // user cancelled task dialog
             if(prevTask.getId() == task.getId()){
@@ -80,29 +79,19 @@ public class BranchNew extends OpenTaskAction {
             // ------------------------------------------------------------------------------------------------
             // no remote task selected
             if(task.getIssueUrl() == null){
+                Task remoteTask = IssueTrackerUtil.getTaskByNumber(taskManager, task.getPresentableName().trim());
 
-                List<Task> taskList = taskManager.getIssues("");
-                for(Task remoteTask: taskList){
-                    if(remoteTask.getNumber().equals(task.getPresentableName().trim())){
-                        task = remoteTask;
-//                        Task localTask = taskManager.findTask(task.getId());
-//                        if(localTask == null){
-//                            taskManager.addTask(task);
-//                        }
-                        IssueTrackerUtil.notify("Found remote task: " + task.getPresentableName(), MessageType.INFO, project);
-                        break;
-                    }
-                }
-
-                // if after loop still cannot find a matchnig remote task, then throw error
-                if(task.getIssueUrl() == null){
+                if(remoteTask == null){
                     taskManager.removeTask((LocalTask) task);
                     throw new Exception("Please select a valid issue. ");
+                }else{
+                    task = remoteTask;
+                    IssueTrackerUtil.notify("Found remote task: " + task.getPresentableName(), MessageType.INFO, project);
                 }
+
             }
 
             String branchName = task.getNumber()+"-"+task.getSummary().replace(' ', '_');
-
             IssueTrackerUtil.getGitBranchOperationsProcessor(event).checkoutNewBranch(branchName);
 
         }catch(Exception e){

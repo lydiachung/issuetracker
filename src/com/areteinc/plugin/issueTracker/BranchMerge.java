@@ -1,5 +1,7 @@
 package com.areteinc.plugin.issueTracker;
 
+import com.intellij.history.*;
+import com.intellij.history.Label;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -8,12 +10,23 @@ import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.*;
 import com.intellij.openapi.vcs.changes.ui.ChangesViewContentManager;
+import com.intellij.openapi.vcs.update.ActionInfo;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.tasks.Task;
 import com.intellij.tasks.TaskManager;
+import git4idea.GitRevisionNumber;
+import git4idea.GitUtil;
+import git4idea.actions.GitMerge;
 import git4idea.actions.GitPull;
+import git4idea.commands.GitHandlerUtil;
+import git4idea.commands.GitLineHandler;
+import git4idea.i18n.GitBundle;
 import git4idea.merge.GitMergeDialog;
+import git4idea.merge.GitMergeUtil;
+import git4idea.repo.GitRepository;
+import git4idea.repo.GitRepositoryManager;
 
+import java.awt.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -45,9 +58,6 @@ public class BranchMerge extends GitPull {
 
             // ------------------------------------------------------------------------------------------------
             // activate task
-            boolean clearContext = true;
-            boolean createChangelist = false;
-
             TaskManager taskManager = TaskManager.getManager(project);
             Task task = IssueTrackerUtil.getTaskByNumber(taskManager, taskNumber);
 
@@ -61,10 +71,6 @@ public class BranchMerge extends GitPull {
                 stringBuilder.append("]");
                 throw new Exception(stringBuilder.toString());
             }
-
-            taskManager.activateTask(task, clearContext, createChangelist); // void activateTask(@NotNull Task task, boolean clearContext, boolean createChangelist);
-
-            IssueTrackerUtil.notify("Activated task " + task.getPresentableName() + ".", MessageType.INFO, project);
 
             // ------------------------------------------------------------------------------------------------
             // check out master
@@ -91,7 +97,7 @@ public class BranchMerge extends GitPull {
 
             // ------------------------------------------------------------------------------------------------
             // merge
-            IssueTrackerUtil.getGitBranchOperationsProcessor(event).merge(localBranchName, true); // localBranch => true
+            new GitMergeOperation(localBranchName).actionPerformed(event);
 
         }catch(Exception e){
             IssueTrackerUtil.notify("Failed to merge branch - error occurred: '" + e.getMessage() + "'", MessageType.ERROR, project);
@@ -99,34 +105,44 @@ public class BranchMerge extends GitPull {
     }
 }
 
-//class GitMergeOperation{
-//    protected void perform(final Project project, final List<VirtualFile> gitRoots, final VirtualFile defaultRoot, final Set<VirtualFile> affectedRoots, final List<VcsException> exceptions) throws VcsException {
-//        GitMergeDialog dialog = new GitMergeDialog(project, gitRoots, defaultRoot);
-////        dialog.show();
-////        if (!dialog.isOK()) {
-////        return;
-////        }
-////        Label beforeLabel = LocalHistory.getInstance().putSystemLabel(project, "Before update");
-//        GitLineHandler h = dialog.handler();
-//        final VirtualFile root = dialog.getSelectedRoot();
-//        affectedRoots.add(root);
-//        GitRevisionNumber currentRev = GitRevisionNumber.resolve(project, root, "HEAD");
-//        try {
-//              GitHandlerUtil.doSynchronously(h, GitBundle.message("merging.title", dialog.getSelectedRoot().getPath()), h.printableCommandLine());
-//        }
-//        finally {
-//        exceptions.addAll(h.errors());
-//        GitRepositoryManager manager = GitUtil.getRepositoryManager(project);
-//        if (manager != null) {
-//        manager.updateRepository(root, GitRepository.TrackedTopic.ALL_CURRENT);
-//        }
-//        }
-////        if (exceptions.size() != 0) {
-////        return;
-////        }
-////        GitMergeUtil.showUpdates(this, project, exceptions, root, currentRev, beforeLabel, getActionName(), ActionInfo.INTEGRATE);
-//    }
-//}
+class GitMergeOperation extends GitMerge {
+
+    String mergeBranchName = null;
+
+    public GitMergeOperation(String branchName){
+        mergeBranchName = branchName;
+    }
+
+    protected void perform(final Project project, final List<VirtualFile> gitRoots, final VirtualFile defaultRoot, final Set<VirtualFile> affectedRoots, final List<VcsException> exceptions) throws VcsException {
+        GitMergeDialog gitMergeDialog = new GitMergeDialog(project, gitRoots, defaultRoot);
+        gitMergeDialog.close(GitMergeDialog.OK_EXIT_CODE);
+        Label beforeLabel = LocalHistory.getInstance().putSystemLabel(project, "Before update");
+        GitLineHandler gitLineHandler = gitMergeDialog.handler();
+        gitLineHandler.addParameters("--no-commit");
+        gitLineHandler.addParameters("--squash");
+        gitLineHandler.addParameters(mergeBranchName);
+
+        final VirtualFile root = project.getBaseDir();
+        affectedRoots.add(root);
+        GitRevisionNumber currentRev = GitRevisionNumber.resolve(project, root, "HEAD");
+
+        try {
+            GitHandlerUtil.doSynchronously(gitLineHandler, GitBundle.message("merging.title", root.getPath()), gitLineHandler.printableCommandLine());
+        }finally {
+            exceptions.addAll(gitLineHandler.errors());
+            GitRepositoryManager manager = GitUtil.getRepositoryManager(project);
+            if (manager != null) {
+                manager.updateRepository(root, GitRepository.TrackedTopic.ALL_CURRENT);
+            }
+        }
+
+        if (exceptions.size() != 0) {
+            return;
+        }
+
+        GitMergeUtil.showUpdates(this, project, exceptions, root, currentRev, beforeLabel, getActionName(), ActionInfo.INTEGRATE);
+    }
+}
 
 class LocalChangeListListener implements ChangeListListener {
 
