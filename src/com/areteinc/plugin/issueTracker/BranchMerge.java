@@ -57,22 +57,6 @@ public class BranchMerge extends GitPull {
             }
 
             // ------------------------------------------------------------------------------------------------
-            // activate task
-            TaskManager taskManager = TaskManager.getManager(project);
-            Task task = IssueTrackerUtil.getTaskByNumber(taskManager, taskNumber);
-
-            if(task == null){
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("Task ").append(taskNumber).append(" not found. ");
-                stringBuilder.append("Available tasks are: [");
-                for(Task localTask : taskManager.getLocalTasks()){
-                    stringBuilder.append(localTask.getNumber()).append(",");
-                }
-                stringBuilder.append("]");
-                throw new Exception(stringBuilder.toString());
-            }
-
-            // ------------------------------------------------------------------------------------------------
             // check out master
             IssueTrackerUtil.getGitBranchOperationsProcessor(event).checkout(masterBranchName);
 
@@ -84,8 +68,7 @@ public class BranchMerge extends GitPull {
 
             // ------------------------------------------------------------------------------------------------
             // create changelist (update changelist comment)
-            String taskSummary = task.getSummary();
-            String commitComment = "#"+taskNumber+" "+taskSummary+": ";
+            String commitComment = "#" + localBranchName; // 3-task_name
 
             // TODO: might not need to add changelistlistener every time
             ChangeListManager changeListManager = ChangeListManager.getInstance(project);
