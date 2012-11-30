@@ -30,8 +30,6 @@ import java.util.List;
 public class BranchDebug extends AnAction {
     public void actionPerformed(AnActionEvent event) {
 
-
-
         Project project = IssueTrackerUtil.getProject(event);
         TaskManager taskManager = TaskManager.getManager(project);
 

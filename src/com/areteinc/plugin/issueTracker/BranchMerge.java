@@ -5,13 +5,18 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
+import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.*;
 import com.intellij.openapi.vcs.changes.ui.ChangesViewContentManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.tasks.Task;
 import com.intellij.tasks.TaskManager;
 import git4idea.actions.GitPull;
+import git4idea.merge.GitMergeDialog;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -93,6 +98,35 @@ public class BranchMerge extends GitPull {
         }
     }
 }
+
+//class GitMergeOperation{
+//    protected void perform(final Project project, final List<VirtualFile> gitRoots, final VirtualFile defaultRoot, final Set<VirtualFile> affectedRoots, final List<VcsException> exceptions) throws VcsException {
+//        GitMergeDialog dialog = new GitMergeDialog(project, gitRoots, defaultRoot);
+////        dialog.show();
+////        if (!dialog.isOK()) {
+////        return;
+////        }
+////        Label beforeLabel = LocalHistory.getInstance().putSystemLabel(project, "Before update");
+//        GitLineHandler h = dialog.handler();
+//        final VirtualFile root = dialog.getSelectedRoot();
+//        affectedRoots.add(root);
+//        GitRevisionNumber currentRev = GitRevisionNumber.resolve(project, root, "HEAD");
+//        try {
+//              GitHandlerUtil.doSynchronously(h, GitBundle.message("merging.title", dialog.getSelectedRoot().getPath()), h.printableCommandLine());
+//        }
+//        finally {
+//        exceptions.addAll(h.errors());
+//        GitRepositoryManager manager = GitUtil.getRepositoryManager(project);
+//        if (manager != null) {
+//        manager.updateRepository(root, GitRepository.TrackedTopic.ALL_CURRENT);
+//        }
+//        }
+////        if (exceptions.size() != 0) {
+////        return;
+////        }
+////        GitMergeUtil.showUpdates(this, project, exceptions, root, currentRev, beforeLabel, getActionName(), ActionInfo.INTEGRATE);
+//    }
+//}
 
 class LocalChangeListListener implements ChangeListListener {
 

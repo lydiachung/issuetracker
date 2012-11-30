@@ -39,6 +39,11 @@ import git4idea.branch.GitBranchOperationsProcessor;
  * task.isIssue() => false
  * task.getType() => OTHER
  * task.getIssueUrl() => null
+ * task.getId() => LOCAL-00021
+ * task.getNumber() => 00021
+ * task.getDescription() => null
+ * task.getPresentableName() => 3
+ * task.getSummary() => 3
  * -------------------------------------------------------------------
  */
 
@@ -64,6 +69,7 @@ public class BranchNew extends OpenTaskAction {
 
             Task task = taskManager.getActiveTask();
 
+
             // ------------------------------------------------------------------------------------------------
             // user cancelled task dialog
             if(prevTask.getId() == task.getId()){
@@ -74,8 +80,25 @@ public class BranchNew extends OpenTaskAction {
             // ------------------------------------------------------------------------------------------------
             // no remote task selected
             if(task.getIssueUrl() == null){
-                taskManager.removeTask((LocalTask) task);
-                throw new Exception("Please select a valid issue. ");
+
+                List<Task> taskList = taskManager.getIssues("");
+                for(Task remoteTask: taskList){
+                    if(remoteTask.getNumber().equals(task.getPresentableName().trim())){
+                        task = remoteTask;
+//                        Task localTask = taskManager.findTask(task.getId());
+//                        if(localTask == null){
+//                            taskManager.addTask(task);
+//                        }
+                        IssueTrackerUtil.notify("Found remote task: " + task.getPresentableName(), MessageType.INFO, project);
+                        break;
+                    }
+                }
+
+                // if after loop still cannot find a matchnig remote task, then throw error
+                if(task.getIssueUrl() == null){
+                    taskManager.removeTask((LocalTask) task);
+                    throw new Exception("Please select a valid issue. ");
+                }
             }
 
             String branchName = task.getNumber()+"-"+task.getSummary().replace(' ', '_');

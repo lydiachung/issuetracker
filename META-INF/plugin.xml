@@ -32,6 +32,9 @@
         <action id="IssueTracker.BranchDebug" class="com.areteinc.plugin.issueTracker.BranchDebug" text="Branch Debug">
             <add-to-group group-id="VcsGlobalGroup" anchor="last"/>
         </action>
+        <action id="IssueTracker.CmdDebug" class="com.areteinc.plugin.issueTracker.CmdDebug" text="Cmd Debug" description="Cmd Debug">
+            <add-to-group group-id="VcsGlobalGroup" anchor="last"/>
+        </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">

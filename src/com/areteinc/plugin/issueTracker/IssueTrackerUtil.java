@@ -1,11 +1,22 @@
 package com.areteinc.plugin.issueTracker;
 
+import com.intellij.execution.filters.TextConsoleBuilder;
+import com.intellij.execution.filters.TextConsoleBuilderFactory;
+import com.intellij.execution.process.OSProcessHandler;
+import com.intellij.execution.process.ProcessEvent;
+import com.intellij.execution.process.ProcessListener;
+import com.intellij.execution.process.ProcessOutputTypes;
+import com.intellij.execution.ui.ConsoleView;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vcs.changes.ui.ChangesViewContentManager;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowAnchor;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.tasks.Task;
 import com.intellij.tasks.TaskManager;
 import git4idea.GitUtil;
@@ -14,6 +25,7 @@ import git4idea.repo.GitRepositoryManager;
 import git4idea.branch.GitBranchOperationsProcessor;
 import git4idea.ui.branch.GitMultiRootBranchConfig;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +39,10 @@ import java.util.List;
 public class IssueTrackerUtil {
 
     static NotificationGroup notificationGroup;
+
+    static ToolWindow toolWindow = null;
+    static ConsoleView consoleView = null;
+    static String toolWindowName = "Git Console";
 
     public static void notify(String messageContent, MessageType messageType, Project project){
         if(notificationGroup == null){
@@ -79,4 +95,40 @@ public class IssueTrackerUtil {
         return null;
     }
 
+    public static void execute(String command, Project project, ProcessListener processListener) throws Exception {
+
+        try {
+            Runtime runtime = Runtime.getRuntime();
+            Process process = runtime.exec(command, new String[0], new File(project.getBasePath()));
+            ToolWindowManager manager = ToolWindowManager.getInstance(project);
+
+            if (consoleView == null) {
+                TextConsoleBuilderFactory factory = TextConsoleBuilderFactory.getInstance();
+                TextConsoleBuilder builder = factory.createBuilder(project);
+                consoleView = builder.getConsole();
+            }
+
+            OSProcessHandler processHandler = new OSProcessHandler(process, command);
+
+            if(processListener != null){
+                processHandler.addProcessListener(processListener);
+            }
+
+            consoleView.attachToProcess(processHandler);
+            processHandler.startNotify();
+            toolWindow = manager.getToolWindow(toolWindowName);
+
+            if (toolWindow == null) {
+                toolWindow = manager.registerToolWindow(toolWindowName, consoleView.getComponent(), ToolWindowAnchor.BOTTOM);
+                toolWindow.show(new Runnable() {
+                    public void run() {}
+                });
+            }
+            int exitValue = process.waitFor();
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
 }
+
